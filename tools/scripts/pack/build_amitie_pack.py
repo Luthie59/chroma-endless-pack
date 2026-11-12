@@ -160,6 +160,16 @@ files.update(clock_files)
 skin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "skins", "margot_v2.png")
 files["assets/chroma/textures/skins/margot.png"] = open(skin, "rb").read()
 
+# ----------------------------------------------------------------- the two homes (3D models) + blue fences
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "maisons"))
+import maisons
+home_files, _ = maisons.build()
+files.update(home_files)
+bars = Image.new("RGBA", (16, 16), (0, 0, 0, 0)); bd = ImageDraw.Draw(bars)
+for x in (1, 5, 9, 13): bd.rectangle([x, 0, x + 1, 15], fill=(48, 86, 190, 255))
+bd.rectangle([0, 1, 15, 2], fill=(40, 74, 170, 255)); bd.rectangle([0, 13, 15, 14], fill=(40, 74, 170, 255))
+put("block/iron_bars.png", bars)
+
 files["pack.mcmeta"] = json.dumps({"pack": {"description": "§dL'Instant Éternel", "min_format": 75, "max_format": 75}},
                                   ensure_ascii=False).encode("utf-8")
 leaves.resize((S * 8, S * 8), Image.NEAREST).save(os.path.join(OUT, "leaves_preview.png"))
