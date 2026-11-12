@@ -1,5 +1,5 @@
 name: CitadelleMessages
-version: 1.6.0
+version: 1.7.0
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
 description: Faille temporelle + Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
@@ -18,7 +18,14 @@ commands:
     description: Classement des Grandes Maisons (place/retirer/reset/reload pour le staff).
     usage: /maisons [place | retirer | reset | reload]
     aliases: [classement, grandesmaisons]
+  quetes:
+    description: Le registre de l'Archiviste (quetes du jour et de la semaine).
+    usage: /quetes [pnj [retirer] | reset <joueur> | reload]
+    aliases: [quete, quests, archiviste]
 permissions:
+  citadelle.quetes.admin:
+    description: Placer l'Archiviste, remettre les quetes d'un joueur a zero, recharger.
+    default: op
   citadelle.maisons.admin:
     description: Placer le classement des Grandes Maisons et remettre les victoires a zero.
     default: op
