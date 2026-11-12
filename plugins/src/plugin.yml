@@ -1,7 +1,7 @@
 name: CitadelleMessages
-version: 1.0.0
+version: 1.1.0
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
-description: Faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
+description: Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
 author: La Citadelle
 softdepend: [PlaceholderAPI, StaffPlusPlus, LuckPerms]
