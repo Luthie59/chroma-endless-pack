@@ -59,7 +59,7 @@ def window(d, cx, top, w, h, kind, rnd):
 
 def b_facade(front):
     w, h = int(B_W * PPM), int(B_H * PPM)
-    im = speckle(w, h, (176, 164, 140), 10, .05)
+    im = speckle(w, h, (196, 184, 158), 10, .05)
     d = ImageDraw.Draw(im)
     # panel joints: verticals ~1.45 m, horizontals at sills and lintels of each level
     for x in range(0, w, int(1.45 * PPM)): d.line([(x, 0), (x, h)], fill=(150, 160, 168, 255))
@@ -114,7 +114,7 @@ def b_facade(front):
 
 def b_gable():
     w, h = int(B_D * PPM), int(B_H * PPM)
-    im = speckle(w, h, (176, 164, 140), 10, .05); d = ImageDraw.Draw(im)
+    im = speckle(w, h, (196, 184, 158), 10, .05); d = ImageDraw.Draw(im)
     for x in range(0, w, int(1.45 * PPM)): d.line([(x, 0), (x, h)], fill=(150, 160, 168, 255))
     for y in range(h, 0, -int(B_FLOOR * PPM / 2)): d.line([(0, y), (w, y)], fill=(150, 160, 168, 255))
     d.rectangle([0, h - int(B_PLINTH * PPM), w, h], fill=(232, 232, 226, 255))
@@ -131,7 +131,7 @@ def b_roof():
 D_W, D_D = 21.5, 16.5
 D_PIL, D_FLOORS, D_FL = 3.5, 12, 2.7
 D_TOP = D_PIL + D_FLOORS * D_FL + .6           # 36.5 m
-BRICK, BRICK_D = (196, 98, 64), (168, 80, 52)
+BRICK, BRICK_D = (222, 116, 74), (196, 98, 62)
 
 def cladding(w, h):
     im = speckle(w, h, BRICK, 7, 0); d = ImageDraw.Draw(im)
