@@ -62,9 +62,12 @@ final class TimeRift implements Listener {
     private BukkitTask secondTask, fastTask;
     private String lastAutoMinute = "";
 
-    TimeRift(CitadelleMessages plugin, Chronon chronon) {
+    private final java.util.function.Consumer<FactionBridge.Team> onWin;
+
+    TimeRift(CitadelleMessages plugin, Chronon chronon, FactionBridge factions, java.util.function.Consumer<FactionBridge.Team> onWin) {
         this.plugin = plugin;
-        this.factions = new FactionBridge(plugin.getLogger());
+        this.factions = factions;
+        this.onWin = onWin;
         this.mobs = new RiftMobs(chronon);
         this.loot = new RiftLoot(plugin, factions, chronon);
         reload();
@@ -243,6 +246,11 @@ final class TimeRift implements Listener {
             p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.8f, 1f);
         }
         boolean chest = loot.place(c, t, cfg);
+        try {
+            onWin.accept(t);
+        } catch (RuntimeException ex) {
+            plugin.getLogger().warning("Victoire non enregistrée au classement : " + ex);
+        }
         broadcast("§5⌛ " + label(t) + " §6remporte la faille temporelle !"
                 + (chest ? " §7Le §6coffre du temps §7est apparu en son cœur." : ""));
         for (Player p : rewarded) {
