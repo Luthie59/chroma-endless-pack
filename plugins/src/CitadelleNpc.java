@@ -42,6 +42,7 @@ final class CitadelleNpc implements Listener {
 
     private static final double LOOK_RANGE = 8;
     private static final long LOOK_PERIOD = 10L;
+    private static final long WATCHDOG_PERIOD = 100L;
 
     private final CitadelleMessages plugin;
     private final Spec spec;
@@ -52,6 +53,7 @@ final class CitadelleNpc implements Listener {
         this.spec = spec;
         Bukkit.getScheduler().runTaskLater(plugin, this::respawn, 40L);
         Bukkit.getScheduler().runTaskTimer(plugin, this::look, 60L, LOOK_PERIOD);
+        Bukkit.getScheduler().runTaskTimer(plugin, this::watchdog, 100L, WATCHDOG_PERIOD);
     }
 
     private Location saved() {
@@ -167,6 +169,13 @@ final class CitadelleNpc implements Listener {
         } catch (ReflectiveOperationException | RuntimeException e) {
             plugin.getLogger().fine("Description du mannequin impossible : " + e);
         }
+    }
+
+    /** every few seconds: if our chunk is loaded but the entity is gone (chunk reloaded early, removed…), respawn. */
+    private void watchdog() {
+        Location at = saved();
+        if (at == null || (npc != null && npc.isValid())) return;
+        if (at.getWorld().isChunkLoaded(at.getBlockX() >> 4, at.getBlockZ() >> 4)) respawn();
     }
 
     /** turn toward the closest player. */
