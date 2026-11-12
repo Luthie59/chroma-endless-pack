@@ -245,6 +245,11 @@ final class Amitie implements Listener, TabExecutor {
                 spin(d, new Quaternionf().rotateY(tick * .045f).rotateX(.45f));
             } else if (ringStep && tags.contains("amitie_anneau_b") && e instanceof Display d) {
                 spin(d, new Quaternionf().rotateX(tick * .035f).rotateZ(-.6f));
+            } else if (ringStep && e instanceof Display d) {
+                // three huge armillary rings around the island: slow precession, tilt, and their own glide
+                if (tags.contains("amitie_geant_1")) spin(d, new Quaternionf().rotateY(tick * .003f).rotateX(1.39f).rotateZ(tick * .008f));
+                else if (tags.contains("amitie_geant_2")) spin(d, new Quaternionf().rotateY(tick * .005f + 2.1f).rotateX(.95f).rotateZ(-tick * .010f));
+                else if (tags.contains("amitie_geant_3")) spin(d, new Quaternionf().rotateY(-tick * .004f + 4.2f).rotateX(-.7f).rotateZ(tick * .012f));
             }
         }
         Location arch = new Location(world, 0.5, 129, 0.5);
