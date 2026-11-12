@@ -1,5 +1,5 @@
 name: CitadelleMessages
-version: 1.4.4
+version: 1.5.0
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
 description: Faille temporelle + Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
@@ -14,7 +14,14 @@ commands:
     description: Echanger ses fragments de chronon aupres de l'Horloger (pnj/donner/reload pour le staff).
     usage: /chronon [pnj [retirer] | donner <joueur> <n> | reload]
     aliases: [chronons, echange, horloger]
+  maisons:
+    description: Classement des Grandes Maisons (place/retirer/reset/reload pour le staff).
+    usage: /maisons [place | retirer | reset | reload]
+    aliases: [classement, grandesmaisons]
 permissions:
+  citadelle.maisons.admin:
+    description: Placer le classement des Grandes Maisons et remettre les victoires a zero.
+    default: op
   citadelle.chronon.admin:
     description: Placer l'Horloger, donner des fragments, recharger les offres.
     default: op
