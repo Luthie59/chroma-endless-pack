@@ -3,6 +3,7 @@ package fr.citadelle.messages;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -40,6 +41,10 @@ final class RiftLocator {
         if (ground.isLiquid() || m == Material.ICE || m == Material.PACKED_ICE || m == Material.BLUE_ICE
                 || m == Material.LAVA || m == Material.POWDER_SNOW || m == Material.CACTUS || m == Material.MAGMA_BLOCK) {
             return null;
+        }
+        if (Tag.LOGS.isTagged(m) || Tag.LEAVES.isTagged(m) || m == Material.BAMBOO
+                || m == Material.BROWN_MUSHROOM_BLOCK || m == Material.RED_MUSHROOM_BLOCK || m == Material.MUSHROOM_STEM) {
+            return null;                                  // tree tops are not ground
         }
         if (ground.getY() <= world.getMinHeight() + 1) return null;
         return ground.getLocation().add(0.5, 1, 0.5);
