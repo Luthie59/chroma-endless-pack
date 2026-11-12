@@ -77,6 +77,13 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
                 "§7Quêtes du jour et de la semaine", org.bukkit.Color.fromRGB(0x5A2A1C), org.bukkit.Material.WRITABLE_BOOK,
                 org.bukkit.Material.LANTERN, questMenu::open));
         getServer().getPluginManager().registerEvents(archiviste, this);
+        Amitie amitie = new Amitie(this);
+        getServer().getPluginManager().registerEvents(amitie, this);
+        org.bukkit.command.PluginCommand amitieCmd = getCommand("amitie");
+        if (amitieCmd != null) {
+            amitieCmd.setExecutor(amitie);
+            amitieCmd.setTabCompleter(amitie);
+        }
         org.bukkit.command.PluginCommand quetesCmd = getCommand("quetes");
         if (quetesCmd != null) {
             QuestCommand qc = new QuestCommand(this, quests, questMenu, archiviste);
