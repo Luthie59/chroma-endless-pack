@@ -24,13 +24,16 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
     private static final Pattern HEX = Pattern.compile("&#([0-9a-fA-F]{6})");
     private Method papiSet;
     private TimeRift rift;
-    private Horloger horloger;
+    private CitadelleNpc horloger, archiviste;
+    private QuestBook quests;
     private HousesBoard houses;
 
     @Override
     public void onDisable() {
         if (rift != null) rift.shutdown();
         if (horloger != null) horloger.despawn();
+        if (archiviste != null) archiviste.despawn();
+        if (quests != null) quests.save();
         if (houses != null) houses.despawn();
     }
 
@@ -60,8 +63,26 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
         }
         ChrononShop shop = new ChrononShop(this, chronon);
         getServer().getPluginManager().registerEvents(shop, this);
-        horloger = new Horloger(this, shop);
+        horloger = new CitadelleNpc(this, new CitadelleNpc.Spec("chronons.pnj", "citadelle_horloger", "§d§l⌛ L'Horloger",
+                "§7Échange de chronons", org.bukkit.Color.fromRGB(0x1B2340), org.bukkit.Material.CLOCK,
+                org.bukkit.Material.SPYGLASS, shop::open));
         getServer().getPluginManager().registerEvents(horloger, this);
+        quests = new QuestBook(this, chronon);
+        QuestListener questListener = new QuestListener(quests);
+        getServer().getPluginManager().registerEvents(questListener, this);
+        rift.onParticipant(questListener::riftResult);
+        QuestMenu questMenu = new QuestMenu(quests, chronon);
+        getServer().getPluginManager().registerEvents(questMenu, this);
+        archiviste = new CitadelleNpc(this, new CitadelleNpc.Spec("archiviste.pnj", "citadelle_archiviste", "§6§l✎ L'Archiviste",
+                "§7Quêtes du jour et de la semaine", org.bukkit.Color.fromRGB(0x5A2A1C), org.bukkit.Material.WRITABLE_BOOK,
+                org.bukkit.Material.LANTERN, questMenu::open));
+        getServer().getPluginManager().registerEvents(archiviste, this);
+        org.bukkit.command.PluginCommand quetesCmd = getCommand("quetes");
+        if (quetesCmd != null) {
+            QuestCommand qc = new QuestCommand(this, quests, questMenu, archiviste);
+            quetesCmd.setExecutor(qc);
+            quetesCmd.setTabCompleter(qc);
+        }
         org.bukkit.command.PluginCommand chrononCmd = getCommand("chronon");
         if (chrononCmd != null) {
             ChrononCommand cc = new ChrononCommand(this, chronon, shop, horloger);
