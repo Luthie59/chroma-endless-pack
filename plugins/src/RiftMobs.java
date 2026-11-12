@@ -2,7 +2,6 @@ package fr.citadelle.messages;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -19,12 +18,8 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -37,27 +32,17 @@ final class RiftMobs implements Listener {
     private static final double GUARDIAN_RELIC_CHANCE = 0.30;
     private static final double SPAWN_MIN = 5, SPAWN_MAX = 13;
 
-    private final NamespacedKey chrononKey;
+    private final Chronon chronon;
     private final Random rnd = new Random();
     private final Set<UUID> alive = new HashSet<>();
     private UUID guardian;
 
-    RiftMobs(Plugin plugin) {
-        this.chrononKey = new NamespacedKey(plugin, "chronon");
+    RiftMobs(Chronon chronon) {
+        this.chronon = chronon;
     }
 
-    /** the rift's currency / trophy, marked so later features (quests, shop) can recognise it. */
     ItemStack fragment(int amount) {
-        ItemStack item = new ItemStack(Material.AMETHYST_SHARD, amount);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setItemName("§d✦ Fragment de chronon");
-            meta.setLore(List.of("§7Un éclat de temps figé,", "§7arraché à une faille temporelle."));
-            meta.setEnchantmentGlintOverride(true);
-            meta.getPersistentDataContainer().set(chrononKey, PersistentDataType.BYTE, (byte) 1);
-            item.setItemMeta(meta);
-        }
-        return item;
+        return chronon.fragment(amount);
     }
 
     int aliveCount() {
