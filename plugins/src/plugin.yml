@@ -1,7 +1,16 @@
 name: CitadelleMessages
-version: 1.1.0
+version: 1.2.0
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
-description: Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
+description: Faille temporelle + Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
 author: La Citadelle
-softdepend: [PlaceholderAPI, StaffPlusPlus, LuckPerms]
+softdepend: [PlaceholderAPI, StaffPlusPlus, LuckPerms, Factions]
+commands:
+  faille:
+    description: Infos sur la faille temporelle (start/stop/tp/reload pour le staff).
+    usage: /faille [info|start [ici]|stop|tp|reload]
+    aliases: [rift]
+permissions:
+  citadelle.faille.admin:
+    description: Lancer, arreter et configurer la faille temporelle.
+    default: op
