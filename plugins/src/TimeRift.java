@@ -234,8 +234,9 @@ final class TimeRift implements Listener {
             p.sendTitle("§6§l✦ " + t.name() + " ✦", "§7remporte la faille temporelle !", 10, 70, 20);
             p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.8f, 1f);
         }
-        broadcast("§5⌛ " + label(t) + " §6remporte la faille temporelle ! §7Le §6coffre du temps §7est apparu en son cœur.");
-        loot.place(c, t, cfg);
+        boolean chest = loot.place(c, t, cfg);
+        broadcast("§5⌛ " + label(t) + " §6remporte la faille temporelle !"
+                + (chest ? " §7Le §6coffre du temps §7est apparu en son cœur." : ""));
         for (Player p : rewarded) {
             for (String cmd : cfg.rewardCommands()) {
                 String line = cmd.replace("{player}", p.getName()).replace("{faction}", t.name());
