@@ -74,6 +74,7 @@ final class ChrononShop implements Listener {
     }
 
     void open(Player p) {
+        chronon.refresh(p.getInventory());
         Holder holder = new Holder();
         Inventory inv = Bukkit.createInventory(holder, SIZE, TITLE);
         holder.inventory = inv;
