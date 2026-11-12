@@ -1,0 +1,5 @@
+# Messages envoyes a tout le serveur quand un membre du staff passe en vanish (/v ou /staff).
+# {player} = pseudo, les placeholders PlaceholderAPI sont acceptes (ex : %luckperms_prefix%).
+# Couleurs : codes & et &#RRGGBB.
+fake-quit: "&8[&c-&8] %luckperms_prefix%{player} &7a quitté la Citadelle"
+fake-join: "&8[&a+&8] %luckperms_prefix%{player} &7est arrivé dans la Citadelle"
