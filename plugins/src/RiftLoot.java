@@ -107,7 +107,7 @@ final class RiftLoot implements Listener {
         }
     }
 
-    /** "MATERIAL min-max chance" (or "CHRONON ..."), null when the roll fails or the line is invalid. */
+    /** "MATERIAL min-max chance%" ; CHRONON, RELIC and ENCHANTED_BOOK:key[:level] are special, null when the roll fails or the line is invalid. */
     private ItemStack parse(String line) {
         String[] p = line.trim().split("\\s+");
         if (p.length == 0 || p[0].isEmpty()) return null;
@@ -122,6 +122,13 @@ final class RiftLoot implements Listener {
             if (rnd.nextDouble() >= chance) return null;
             int amount = min + rnd.nextInt(Math.max(1, max - min + 1));
             if (p[0].equalsIgnoreCase("CHRONON")) return mobs.fragment(amount);
+            if (p[0].equalsIgnoreCase("RELIC")) return RiftRelics.randomRelic(rnd);
+            if (p[0].toUpperCase(java.util.Locale.ROOT).startsWith("ENCHANTED_BOOK:")) {
+                String[] b = p[0].split(":");
+                ItemStack book = RiftRelics.book(b[1], b.length > 2 ? Integer.parseInt(b[2]) : 99);
+                if (book == null) log.warning("Enchantement inconnu dans le butin : " + line);
+                return book;
+            }
             Material m = Material.matchMaterial(p[0]);
             if (m == null || !m.isItem()) {
                 log.warning("Butin de faille invalide : " + line);
