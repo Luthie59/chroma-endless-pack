@@ -150,3 +150,194 @@ maisons:
     power: 1
     terres: 2
     failles: 25
+
+# L'Archiviste : quetes quotidiennes (5 max) et hebdomadaires (2 max), tirees au hasard pour chaque joueur.
+# types : TUER (cibles : HOSTILE, ANY ou types d'entite), TUER_JOUEUR, MINER / RECOLTER (cibles : blocs ou #tag),
+#         PECHER, FAILLE_PARTICIPER, FAILLE_GAGNER. Recompenses : chronons (fragments), argent, commandes ({player}).
+# Le PNJ se place avec /quetes pnj.
+archiviste:
+  timezone: Europe/Paris
+  quotidiennes: 5
+  hebdomadaires: 2
+  bonus-jour:
+    chronons: 5
+    argent: 1000
+  bonus-semaine:
+    chronons: 25
+    argent: 5000
+  quetes:
+    chasseur:
+      periode: jour
+      type: TUER
+      cibles: [HOSTILE]
+      nombre: 40
+      nom: "Chasseur d'ombres"
+      objectif: "Terrasse 40 monstres."
+      icone: IRON_SWORD
+      chronons: 2
+      argent: 300
+    zombies:
+      periode: jour
+      type: TUER
+      cibles: [ZOMBIE, HUSK, DROWNED, ZOMBIE_VILLAGER]
+      nombre: 20
+      nom: "Les morts qui marchent"
+      objectif: "Élimine 20 zombies."
+      icone: ROTTEN_FLESH
+      chronons: 2
+      argent: 250
+    squelettes:
+      periode: jour
+      type: TUER
+      cibles: [SKELETON, STRAY, BOGGED]
+      nombre: 15
+      nom: "Os brisés"
+      objectif: "Élimine 15 squelettes."
+      icone: BONE
+      chronons: 2
+      argent: 250
+    creepers:
+      periode: jour
+      type: TUER
+      cibles: [CREEPER]
+      nombre: 8
+      nom: "Désamorçage"
+      objectif: "Élimine 8 creepers."
+      icone: GUNPOWDER
+      chronons: 2
+      argent: 300
+    araignees:
+      periode: jour
+      type: TUER
+      cibles: [SPIDER, CAVE_SPIDER]
+      nombre: 15
+      nom: "Toiles du temps"
+      objectif: "Élimine 15 araignées."
+      icone: STRING
+      chronons: 2
+      argent: 250
+    charbon:
+      periode: jour
+      type: MINER
+      cibles: [COAL_ORE, DEEPSLATE_COAL_ORE]
+      nombre: 48
+      nom: "Combustible"
+      objectif: "Mine 48 minerais de charbon."
+      icone: COAL
+      chronons: 2
+      argent: 250
+    fer:
+      periode: jour
+      type: MINER
+      cibles: [IRON_ORE, DEEPSLATE_IRON_ORE]
+      nombre: 32
+      nom: "Âge du fer"
+      objectif: "Mine 32 minerais de fer."
+      icone: RAW_IRON
+      chronons: 3
+      argent: 350
+    diamants:
+      periode: jour
+      type: MINER
+      cibles: [DIAMOND_ORE, DEEPSLATE_DIAMOND_ORE]
+      nombre: 6
+      nom: "Éclats d'éternité"
+      objectif: "Mine 6 minerais de diamant."
+      icone: DIAMOND
+      chronons: 4
+      argent: 500
+    pierre:
+      periode: jour
+      type: MINER
+      cibles: [STONE, DEEPSLATE, COBBLESTONE, ANDESITE, DIORITE, GRANITE, TUFF]
+      nombre: 256
+      nom: "Tailleur de pierre"
+      objectif: "Mine 256 blocs de pierre."
+      icone: STONE_PICKAXE
+      chronons: 2
+      argent: 250
+    bucheron:
+      periode: jour
+      type: MINER
+      cibles: ["#LOGS"]
+      nombre: 64
+      nom: "Bûcheron"
+      objectif: "Coupe 64 bûches."
+      icone: IRON_AXE
+      chronons: 2
+      argent: 250
+    recoltes:
+      periode: jour
+      type: RECOLTER
+      cibles: [ANY]
+      nombre: 64
+      nom: "Moissons"
+      objectif: "Récolte 64 cultures mûres."
+      icone: WHEAT
+      chronons: 2
+      argent: 250
+    peche:
+      periode: jour
+      type: PECHER
+      nombre: 10
+      nom: "Pêcheur des époques"
+      objectif: "Pêche 10 prises."
+      icone: FISHING_ROD
+      chronons: 2
+      argent: 250
+    duelliste:
+      periode: jour
+      type: TUER_JOUEUR
+      nombre: 3
+      nom: "Duelliste"
+      objectif: "Vaincs 3 joueurs."
+      icone: GOLDEN_SWORD
+      chronons: 4
+      argent: 600
+    faille_participer:
+      periode: semaine
+      type: FAILLE_PARTICIPER
+      nombre: 2
+      nom: "Voyageur des failles"
+      objectif: "Combats dans 2 failles temporelles (30 s dans la zone)."
+      icone: RECOVERY_COMPASS
+      chronons: 15
+      argent: 2500
+    faille_gagner:
+      periode: semaine
+      type: FAILLE_GAGNER
+      nombre: 1
+      nom: "Maître du temps"
+      objectif: "Remporte une faille temporelle."
+      icone: NETHER_STAR
+      chronons: 25
+      argent: 4000
+    exterminateur:
+      periode: semaine
+      type: TUER
+      cibles: [HOSTILE]
+      nombre: 300
+      nom: "Exterminateur"
+      objectif: "Terrasse 300 monstres."
+      icone: NETHERITE_SWORD
+      chronons: 15
+      argent: 3000
+    mineur:
+      periode: semaine
+      type: MINER
+      cibles: [DIAMOND_ORE, DEEPSLATE_DIAMOND_ORE]
+      nombre: 32
+      nom: "Cœur de la montagne"
+      objectif: "Mine 32 minerais de diamant."
+      icone: DIAMOND_PICKAXE
+      chronons: 15
+      argent: 3000
+    conquerant:
+      periode: semaine
+      type: TUER_JOUEUR
+      nombre: 15
+      nom: "Conquérant"
+      objectif: "Vaincs 15 joueurs."
+      icone: NETHERITE_HELMET
+      chronons: 20
+      argent: 4000
