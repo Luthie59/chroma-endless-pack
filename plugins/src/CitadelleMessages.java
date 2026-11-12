@@ -44,6 +44,14 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
         houses = new HousesBoard(this, factions);
         getServer().getPluginManager().registerEvents(houses, this);
         rift = new TimeRift(this, chronon, factions, houses::recordWin);
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            try {
+                new CitadelleExpansion(this, rift, chronon).register();
+                getLogger().info("Placeholders %citadelle_*% enregistrés.");
+            } catch (LinkageError | RuntimeException e) {
+                getLogger().warning("Placeholders indisponibles : " + e);
+            }
+        }
         org.bukkit.command.PluginCommand maisonsCmd = getCommand("maisons");
         if (maisonsCmd != null) {
             HousesCommand hc = new HousesCommand(this, houses);
