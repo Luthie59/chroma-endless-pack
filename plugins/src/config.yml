@@ -33,20 +33,34 @@ faille:
   # Vagues d'echos temporels (seulement si des joueurs sont proches).
   wave-interval-seconds: 45
   max-mobs: 18
-  # Commandes console pour chaque joueur gagnant ayant participe ({player}, {faction}).
+  # Commandes console pour chaque joueur gagnant ayant tenu la zone >= 30 s ({player}, {faction}).
   reward-commands:
-    - "eco give {player} 2500"
+    - "eco give {player} 5000"
+  # Commandes pour les joueurs des AUTRES factions qui se sont battus >= 30 s dans la zone.
+  participation-commands:
+    - "eco give {player} 750"
   # Coffre du temps : reserve aux gagnants pendant chest-protection-seconds, disparait apres chest-lifetime-seconds.
   chest-protection-seconds: 60
   chest-lifetime-seconds: 300
-  # "MATERIAU min-max chance%" ; CHRONON = fragment de chronon.
+  # "MATERIAU min-max chance%". Speciaux : CHRONON (fragment de chronon), RELIC (relique temporelle :
+  # arme/armure/outil legendaire enchante), ENCHANTED_BOOK:<enchantement>[:niveau] (niveau max par defaut).
   loot:
-    - "DIAMOND 2-5 100"
-    - "GOLDEN_APPLE 2-4 100"
-    - "ENCHANTED_GOLDEN_APPLE 1 15"
-    - "NETHERITE_SCRAP 1-2 40"
-    - "EMERALD 8-16 80"
-    - "EXPERIENCE_BOTTLE 8-16 80"
-    - "ENDER_PEARL 4-8 70"
-    - "TOTEM_OF_UNDYING 1 20"
-    - "CHRONON 3-6 100"
+    - "RELIC 1 100"
+    - "RELIC 1 25"
+    - "DIAMOND 8-16 100"
+    - "NETHERITE_INGOT 1-2 45"
+    - "NETHERITE_SCRAP 2-4 70"
+    - "ENCHANTED_GOLDEN_APPLE 1-2 40"
+    - "GOLDEN_APPLE 6-12 100"
+    - "TOTEM_OF_UNDYING 1-2 50"
+    - "ENCHANTED_BOOK:mending 1 50"
+    - "ENCHANTED_BOOK:sharpness 1 40"
+    - "ENCHANTED_BOOK:protection 1 40"
+    - "ENCHANTED_BOOK:efficiency 1 30"
+    - "ENCHANTED_BOOK:unbreaking 1 30"
+    - "EMERALD_BLOCK 3-6 80"
+    - "EXPERIENCE_BOTTLE 24-48 100"
+    - "ENDER_PEARL 8-16 90"
+    - "SHULKER_BOX 1 25"
+    - "ELYTRA 1 6"
+    - "CHRONON 10-20 100"
