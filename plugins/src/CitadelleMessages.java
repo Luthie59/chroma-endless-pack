@@ -23,11 +23,24 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
 
     private static final Pattern HEX = Pattern.compile("&#([0-9a-fA-F]{6})");
     private Method papiSet;
+    private TimeRift rift;
+
+    @Override
+    public void onDisable() {
+        if (rift != null) rift.shutdown();
+    }
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new Regeneration(this), this);
+        rift = new TimeRift(this);
+        org.bukkit.command.PluginCommand faille = getCommand("faille");
+        if (faille != null) {
+            RiftCommand cmd = new RiftCommand(this, rift);
+            faille.setExecutor(cmd);
+            faille.setTabCompleter(cmd);
+        }
         Plugin papi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
         if (papi != null) {
             try {
