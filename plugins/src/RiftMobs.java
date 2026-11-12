@@ -33,7 +33,8 @@ import java.util.UUID;
 final class RiftMobs implements Listener {
 
     static final String MOB_TAG = "citadelle_faille_mob";
-    private static final double FRAGMENT_CHANCE = 0.35;
+    private static final double FRAGMENT_CHANCE = 0.45;
+    private static final double GUARDIAN_RELIC_CHANCE = 0.30;
     private static final double SPAWN_MIN = 5, SPAWN_MAX = 13;
 
     private final NamespacedKey chrononKey;
@@ -160,9 +161,11 @@ final class RiftMobs implements Listener {
         event.getDrops().clear();
         if (e.getUniqueId().equals(guardian)) {
             guardian = null;
-            event.getDrops().add(fragment(3 + rnd.nextInt(3)));
-            event.getDrops().add(new ItemStack(Material.DIAMOND, 2));
-            event.setDroppedExp(80);
+            event.getDrops().add(fragment(6 + rnd.nextInt(5)));
+            event.getDrops().add(new ItemStack(Material.DIAMOND, 3 + rnd.nextInt(4)));
+            event.getDrops().add(new ItemStack(Material.NETHERITE_SCRAP, 1));
+            if (rnd.nextDouble() < GUARDIAN_RELIC_CHANCE) event.getDrops().add(RiftRelics.randomRelic(rnd));
+            event.setDroppedExp(160);
         } else {
             if (rnd.nextDouble() < FRAGMENT_CHANCE) event.getDrops().add(fragment(1));
             event.setDroppedExp(12);
