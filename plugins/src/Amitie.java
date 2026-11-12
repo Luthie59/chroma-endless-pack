@@ -15,13 +15,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
 
+import java.util.HexFormat;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * "L'Instant Éternel": a private void world frozen at sunset, holding the floating island built in tribute to the
@@ -34,6 +38,9 @@ final class Amitie implements Listener, TabExecutor {
     private static final long SUNSET = 12350L;
     private static final double VOID_RESCUE_Y = 40;
     private static final String P = "§d✿ §7";
+    private static final UUID PACK_ID = UUID.nameUUIDFromBytes("citadelle-amitie-pack".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    private static final String[] FRIENDS = {"Luthie59", "Margot59"};
+    private static final double STATUE_X = 1.5, STATUE_Z0 = 0.0, STATUE_GAP = 1.0, STATUE_Y = 121.35;
 
     /** empty chunks: the island is placed as a structure. */
     private static final class VoidGenerator extends ChunkGenerator {
@@ -94,6 +101,18 @@ final class Amitie implements Listener, TabExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player p)) { sender.sendMessage(P + "Commande en jeu uniquement."); return true; }
         if (!p.hasPermission(PERM) || world == null) { p.sendMessage(P + "Ce lieu n'existe que pour ceux qu'il attend."); return true; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("statues")) {
+            double y = STATUE_Y;
+            try {
+                if (args.length > 1) y = Double.parseDouble(args[1]);
+            } catch (NumberFormatException e) {
+                p.sendMessage(P + "Hauteur invalide.");
+                return true;
+            }
+            placeStatues(y);
+            p.sendMessage(P + "Vos statues sont assises sur le banc (hauteur " + y + ").");
+            return true;
+        }
         if (args.length > 0 && args[0].equalsIgnoreCase("definir")) {
             if (p.getWorld() != world) { p.sendMessage(P + "Place-toi sur l'île pour choisir l'arrivée."); return true; }
             Location l = p.getLocation();
@@ -114,7 +133,63 @@ final class Amitie implements Listener, TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return sender.hasPermission(PERM) && args.length == 1 ? List.of("definir") : List.of();
+        return sender.hasPermission(PERM) && args.length == 1 ? List.of("definir", "statues") : List.of();
+    }
+
+    /**
+     * The two friends, sitting side by side on the bench and facing the sunset: player-skinned mannequins
+     * (vanilla resolves the skin from the name) riding invisible marker armour stands. Vanilla commands are used
+     * on purpose, the Mannequin API differs between Spigot and Paper.
+     */
+    private void placeStatues(double y) {
+        String dim = world.getKey().toString();
+        console("minecraft:execute in " + dim + " run minecraft:kill @e[tag=amitie_statue]");
+        for (int i = 0; i < FRIENDS.length; i++) {
+            double z = STATUE_Z0 + i * STATUE_GAP;
+            String rider = "{id:\"minecraft:mannequin\",profile:\"" + FRIENDS[i] + "\",immovable:1b,hide_description:1b,"
+                    + "Invulnerable:1b,Silent:1b,PersistenceRequired:1b,Rotation:[90f,0f],Tags:[\"amitie\",\"amitie_statue\"]}";
+            console(String.format(java.util.Locale.ROOT, "minecraft:execute in %s run minecraft:summon minecraft:armor_stand %.2f %.2f %.2f "
+                    + "{Invisible:1b,Marker:1b,NoGravity:1b,Invulnerable:1b,Rotation:[90f,0f],Tags:[\"amitie\",\"amitie_statue\"],"
+                    + "Passengers:[%s]}", dim, STATUE_X, y, z, rider));
+        }
+    }
+
+    private static void console(String cmd) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+    }
+
+    // ------------------------------------------------------------------ overlay pack, only inside this world
+
+    private void sendPack(Player p) {
+        String url = plugin.getConfig().getString("amitie.pack.url", "");
+        String sha = plugin.getConfig().getString("amitie.pack.sha1", "");
+        if (url.isEmpty() || sha.length() != 40) return;
+        try {
+            p.addResourcePack(PACK_ID, url, HexFormat.of().parseHex(sha), "§dL'Instant Éternel", false);
+        } catch (LinkageError | RuntimeException e) {
+            plugin.getLogger().warning("Pack de l'Instant Éternel non envoyé : " + e);
+        }
+    }
+
+    private static void dropPack(Player p) {
+        try {
+            p.removeResourcePack(PACK_ID);
+        } catch (LinkageError | RuntimeException ignored) {
+            // older clients / servers: nothing to remove
+        }
+    }
+
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent event) {
+        if (world == null) return;
+        Player p = event.getPlayer();
+        if (p.getWorld() == world) sendPack(p);
+        else if (event.getFrom() == world) dropPack(p);
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        if (world != null && event.getPlayer().getWorld() == world) sendPack(event.getPlayer());
     }
 
     /** nobody else gets in: any teleport into the world without the permission is refused. */
