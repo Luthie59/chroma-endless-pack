@@ -85,9 +85,8 @@ final class Horloger implements Listener {
         m.addScoreboardTag(TAG);
         m.setCustomName("§d§l⌛ L'Horloger");
         m.setCustomNameVisible(true);
-        m.setDescription("§7Échange de chronons");
-        m.setHideDescription(false);
-        m.setImmovable(true);
+        describe(m, "§7Échange de chronons");
+        safely(() -> m.setImmovable(true));
         m.setInvulnerable(true);
         m.setSilent(true);
         m.setRemoveWhenFarAway(false);
@@ -103,6 +102,50 @@ final class Horloger implements Listener {
         eq.setBootsDropChance(0f);
         eq.setItemInMainHandDropChance(0f);
         eq.setItemInOffHandDropChance(0f);
+    }
+
+    /** Mannequin-only API differs between Spigot and Paper: never let it break the NPC. */
+    private void safely(Runnable call) {
+        try {
+            call.run();
+        } catch (LinkageError | RuntimeException e) {
+            plugin.getLogger().fine("API mannequin indisponible : " + e);
+        }
+    }
+
+    /** Spigot: setDescription(String); Paper: a description setter taking an Adventure Component. */
+    private void describe(Mannequin m, String legacy) {
+        try {
+            m.setDescription(legacy);
+            return;
+        } catch (LinkageError ignored) {
+            // Paper server: fall through to the Component variant
+        }
+        try {
+            ClassLoader cl = m.getClass().getClassLoader();
+            Class<?> component = Class.forName("net.kyori.adventure.text.Component", true, cl);
+            Class<?> legacyClass = Class.forName("net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer", true, cl);
+            Object serializer = legacyClass.getMethod("legacySection").invoke(null);
+            Object text = null;
+            for (java.lang.reflect.Method d : legacyClass.getMethods()) {
+                if (d.getName().equals("deserialize") && d.getParameterCount() == 1 && d.getParameterTypes()[0] == String.class) {
+                    text = d.invoke(serializer, legacy);
+                    break;
+                }
+            }
+            if (text == null) return;
+            for (java.lang.reflect.Method set : Mannequin.class.getMethods()) {
+                String n = set.getName().toLowerCase(java.util.Locale.ROOT);
+                if (n.contains("description") && !n.contains("hide") && set.getParameterCount() == 1
+                        && set.getParameterTypes()[0].isAssignableFrom(component)) {
+                    set.invoke(m, text);
+                    return;
+                }
+            }
+            plugin.getLogger().info("Description du mannequin non supportée : nom seul affiché.");
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            plugin.getLogger().fine("Description du mannequin impossible : " + e);
+        }
     }
 
     private static ItemStack armour(Material type) {
