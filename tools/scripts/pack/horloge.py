@@ -166,6 +166,38 @@ def giant_ring():
         d.ellipse([x - 2.5, y - 2.5, x + 2.5, y + 2.5], fill=PINK if k % 2 else (170, 120, 255, 255), outline=GOLD_D)
     return im
 
+def star(letter, main, light, dark, gem, ink):
+    """a five-pointed bevelled star with a halo, a gem heart and the friend's initial."""
+    im = Image.new("RGBA", (N, N), (0, 0, 0, 0)); px = im.load()
+    for y in range(N):                                   # soft halo
+        for x in range(N):
+            d = math.hypot(x - C + .5, y - C + .5)
+            a = max(0.0, 1 - d / 63) ** 2.2
+            if a > .02: px[x, y] = light[:3] + (int(a * 150),)
+    d = ImageDraw.Draw(im)
+    pts = []
+    for k in range(10):
+        a = math.radians(-90 + k * 36); r = 54 if k % 2 == 0 else 22
+        pts.append((C + math.cos(a) * r, C + math.sin(a) * r))
+    for k in range(10):                                  # bevel: each half-branch lit or shaded
+        tri = [(C, C), pts[k], pts[(k + 1) % 10]]
+        d.polygon(tri, fill=light if k % 2 == 0 else main)
+    d.polygon(pts, outline=dark)
+    for k in range(0, 10, 2): d.line([(C, C), pts[k]], fill=dark)
+    d.ellipse([C - 15, C - 15, C + 15, C + 15], fill=dark)
+    d.ellipse([C - 13, C - 13, C + 13, C + 13], fill=gem)
+    d.ellipse([C - 9, C - 11, C - 3, C - 5], fill=tuple(min(255, v + 90) for v in gem[:3]) + (255,))
+    text(d, letter, C, C + 1, ink, 3)
+    return im
+
+def light_thread():
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0)); px = im.load()
+    for y in range(16):
+        for x in range(16):
+            v = 1 - abs(x - 7.5) / 8
+            px[x, y] = (255, int(220 + 35 * v), int(150 + 90 * v), int(120 + 135 * v))
+    return im
+
 def png(im):
     b = io.BytesIO(); im.save(b, "PNG", optimize=True); return b.getvalue()
 
@@ -177,6 +209,9 @@ def build():
     f[t + "horloge_back.png"] = png(back())
     f[t + "anneau_eternel.png"] = png(orrery_ring())
     f[t + "anneau_geant.png"] = png(giant_ring())
+    f[t + "etoile_l.png"] = png(star("L", (226, 176, 64, 255), (255, 236, 160, 255), (150, 100, 30, 255), (60, 90, 220, 255), GOLD_XL))
+    f[t + "etoile_m.png"] = png(star("M", (226, 226, 238, 255), (255, 255, 255, 255), (140, 140, 170, 255), (255, 120, 180, 255), (255, 255, 255, 255)))
+    f[t + "fil_lumiere.png"] = png(light_thread())
     plate = lambda z0, z1, north, south: {"from": [0, 0, z0], "to": [16, 16, z1], "faces": {
         **({"north": {"uv": [0, 0, 16, 16], "texture": north}} if north else {}),
         **({"south": {"uv": [0, 0, 16, 16], "texture": south}} if south else {})}}
@@ -190,7 +225,15 @@ def build():
     f["assets/chroma/models/item/anneau_geant.json"] = json.dumps({
         "textures": {"ring": "chroma:item/anneau_geant", "particle": "chroma:item/anneau_geant"},
         "elements": [plate(8, 8, "#ring", "#ring")]}).encode()
-    for name in ("horloge_eternelle", "anneau_eternel", "anneau_geant"):
+    for st in ("etoile_l", "etoile_m"):
+        f["assets/chroma/models/item/%s.json" % st] = json.dumps({
+            "textures": {"s": "chroma:item/" + st, "particle": "chroma:item/" + st},
+            "elements": [plate(8, 8, "#s", "#s")]}).encode()
+    f["assets/chroma/models/item/fil_lumiere.json"] = json.dumps({
+        "textures": {"t": "chroma:item/fil_lumiere", "particle": "chroma:item/fil_lumiere"},
+        "elements": [{"from": [7.5, 7.5, 0], "to": [8.5, 8.5, 16], "faces": {k: {"uv": [0, 0, 16, 16], "texture": "#t"}
+                      for k in ("north", "south", "east", "west", "up", "down")}}]}).encode()
+    for name in ("horloge_eternelle", "anneau_eternel", "anneau_geant", "etoile_l", "etoile_m", "fil_lumiere"):
         f["assets/chroma/items/%s.json" % name] = json.dumps({"model": {"type": "minecraft:model", "model": "chroma:item/" + name}}).encode()
     return f, {"face": face(), "hands": hands(), "back": back(), "ring": orrery_ring(), "giant": giant_ring()}
 
@@ -203,4 +246,8 @@ if __name__ == "__main__":
         sheet.alpha_composite(k, (i * (N + 10), 0))
     sheet.resize((sheet.width * 2, sheet.height * 2), Image.NEAREST).save(os.path.join(sys.argv[1], "horloge_preview.png"))
     ims["giant"].save(os.path.join(sys.argv[1], "anneau_geant_preview.png"))
+    st = Image.new("RGBA", (N * 2 + 10, N), (40, 40, 60, 255))
+    st.alpha_composite(star("L", (226, 176, 64, 255), (255, 236, 160, 255), (150, 100, 30, 255), (60, 90, 220, 255), GOLD_XL), (0, 0))
+    st.alpha_composite(star("M", (226, 226, 238, 255), (255, 255, 255, 255), (140, 140, 170, 255), (255, 120, 180, 255), (255, 255, 255, 255)), (N + 10, 0))
+    st.resize((st.width * 2, st.height * 2), Image.NEAREST).save(os.path.join(sys.argv[1], "etoiles_preview.png"))
     print("ok")
