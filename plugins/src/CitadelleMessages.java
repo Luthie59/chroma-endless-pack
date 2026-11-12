@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * La Citadelle - styled fake join/quit messages when staff vanish / unvanish with Staff++
+ * La Citadelle - "Régénération" death/respawn effects (see Regeneration) and styled fake join/quit messages when staff vanish / unvanish with Staff++
  * (works for /v and for staff mode). Uses PlaceholderAPI for the LuckPerms prefix and
  * translates '&' colour codes (and &#RRGGBB hex) before broadcasting.
  */
@@ -27,6 +27,7 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        getServer().getPluginManager().registerEvents(new Regeneration(this), this);
         Plugin papi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
         if (papi != null) {
             try {
