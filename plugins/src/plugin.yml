@@ -1,5 +1,5 @@
 name: CitadelleMessages
-version: 1.8.2
+version: 1.9.0
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
 description: Faille temporelle + Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
@@ -24,7 +24,7 @@ commands:
     aliases: [quete, quests, archiviste]
   amitie:
     description: L'Instant Eternel.
-    usage: /amitie
+    usage: /amitie [definir | statues [hauteur]]
 permissions:
   citadelle.amitie:
     description: Acces a l'Instant Eternel (donne joueur par joueur).
