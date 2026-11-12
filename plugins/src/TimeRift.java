@@ -62,11 +62,11 @@ final class TimeRift implements Listener {
     private BukkitTask secondTask, fastTask;
     private String lastAutoMinute = "";
 
-    TimeRift(CitadelleMessages plugin) {
+    TimeRift(CitadelleMessages plugin, Chronon chronon) {
         this.plugin = plugin;
         this.factions = new FactionBridge(plugin.getLogger());
-        this.mobs = new RiftMobs(plugin);
-        this.loot = new RiftLoot(plugin, factions, mobs);
+        this.mobs = new RiftMobs(chronon);
+        this.loot = new RiftLoot(plugin, factions, chronon);
         reload();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         Bukkit.getPluginManager().registerEvents(mobs, plugin);
