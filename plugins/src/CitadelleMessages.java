@@ -37,6 +37,7 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new Regeneration(this), this);
         Chronon chronon = new Chronon(this);
+        getServer().getPluginManager().registerEvents(chronon, this);
         rift = new TimeRift(this, chronon);
         ChrononShop shop = new ChrononShop(this, chronon);
         getServer().getPluginManager().registerEvents(shop, this);
