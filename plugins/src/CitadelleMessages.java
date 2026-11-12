@@ -25,11 +25,13 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
     private Method papiSet;
     private TimeRift rift;
     private Horloger horloger;
+    private HousesBoard houses;
 
     @Override
     public void onDisable() {
         if (rift != null) rift.shutdown();
         if (horloger != null) horloger.despawn();
+        if (houses != null) houses.despawn();
     }
 
     @Override
@@ -38,7 +40,16 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new Regeneration(this), this);
         Chronon chronon = new Chronon(this);
         getServer().getPluginManager().registerEvents(chronon, this);
-        rift = new TimeRift(this, chronon);
+        FactionBridge factions = new FactionBridge(getLogger());
+        houses = new HousesBoard(this, factions);
+        getServer().getPluginManager().registerEvents(houses, this);
+        rift = new TimeRift(this, chronon, factions, houses::recordWin);
+        org.bukkit.command.PluginCommand maisonsCmd = getCommand("maisons");
+        if (maisonsCmd != null) {
+            HousesCommand hc = new HousesCommand(this, houses);
+            maisonsCmd.setExecutor(hc);
+            maisonsCmd.setTabCompleter(hc);
+        }
         ChrononShop shop = new ChrononShop(this, chronon);
         getServer().getPluginManager().registerEvents(shop, this);
         horloger = new Horloger(this, shop);
