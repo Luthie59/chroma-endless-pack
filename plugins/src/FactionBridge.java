@@ -19,10 +19,15 @@ final class FactionBridge {
     /** A capturing side: a faction, or a lone player. */
     record Team(String key, String name, boolean solo) { }
 
+    /** a real (player) faction and its standing. */
+    record House(String id, String name, int power, int land, int members) { }
+
     private final Logger log;
     private Object fplayers;
     private Method getByPlayer, getFaction, isWilderness, getTag, getId, getFactionAt;
     private Object board;
+    private Object factionsRegistry;
+    private Method allFactions, isNormal, powerRounded, landRounded, fplayersOf;
     private Constructor<?> flocation;
     private boolean available;
 
@@ -50,6 +55,17 @@ final class FactionBridge {
             flocation = flocClass.getConstructor(Location.class);
             getFactionAt = boardClass.getMethod("getFactionAt", flocClass);
             available = true;
+            try {
+                Class<?> registry = Class.forName("com.massivecraft.factions.Factions", true, cl);
+                factionsRegistry = registry.getMethod("getInstance").invoke(null);
+                allFactions = registry.getMethod("getAllFactions");
+                isNormal = faction.getMethod("isNormal");
+                powerRounded = faction.getMethod("getPowerRounded");
+                landRounded = faction.getMethod("getLandRounded");
+                fplayersOf = faction.getMethod("getFPlayers");
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                log.warning("Classement des factions indisponible : " + e);
+            }
         } catch (ReflectiveOperationException | RuntimeException e) {
             log.warning("API Factions inaccessible (" + e + ") : la faille comptera chaque joueur seul.");
         }
@@ -68,6 +84,23 @@ final class FactionBridge {
             }
         }
         return new Team("p:" + player.getUniqueId(), player.getName(), true);
+    }
+
+    /** every normal (player-made) faction; empty when Factions is unavailable. */
+    java.util.List<House> houses() {
+        java.util.List<House> out = new java.util.ArrayList<>();
+        if (allFactions == null) return out;
+        try {
+            for (Object f : (java.util.Collection<?>) allFactions.invoke(factionsRegistry)) {
+                if (!(Boolean) isNormal.invoke(f)) continue;
+                out.add(new House(String.valueOf(getId.invoke(f)), ChatColor.stripColor(String.valueOf(getTag.invoke(f))),
+                        ((Number) powerRounded.invoke(f)).intValue(), ((Number) landRounded.invoke(f)).intValue(),
+                        ((java.util.Collection<?>) fplayersOf.invoke(f)).size()));
+            }
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            log.warning("Lecture des factions impossible : " + e);
+        }
+        return out;
     }
 
     /** true when any chunk within {@code chunkRadius} of loc belongs to a faction (or safezone / warzone). */
