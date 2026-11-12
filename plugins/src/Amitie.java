@@ -10,6 +10,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,6 +23,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.util.Transformation;
+import org.joml.Quaternionf;
 
 import java.util.HexFormat;
 import java.util.List;
@@ -39,7 +42,10 @@ final class Amitie implements Listener, TabExecutor {
     private static final double VOID_RESCUE_Y = 40;
     private static final String P = "§d✿ §7";
     private static final UUID PACK_ID = UUID.nameUUIDFromBytes("citadelle-amitie-pack".getBytes(java.nio.charset.StandardCharsets.UTF_8));
-    private static final String[] FRIENDS = {"Luthie59", "Margot59"};
+    /** resolvable profiles (SNBT): Margot's chosen skin comes from the Instant Éternel overlay pack. */
+    private static final String[] FRIENDS = {"\"Luthie59\"", "{name:\"Margot59\",texture:\"chroma:skins/margot\"}"};
+    private static final int RING_STEP = 5;              // every 10 ticks, interpolated
+    private static final double CLOCK_SWAY = 12;
     private static final double STATUE_X = 1.5, STATUE_Z0 = 0.0, STATUE_GAP = 1.0, STATUE_Y = 121.35;
 
     /** empty chunks: the island is placed as a structure. */
@@ -60,6 +66,7 @@ final class Amitie implements Listener, TabExecutor {
     private final CitadelleMessages plugin;
     private World world;
     private float clockYaw;
+    private int tick;
 
     Amitie(CitadelleMessages plugin) {
         this.plugin = plugin;
@@ -146,12 +153,19 @@ final class Amitie implements Listener, TabExecutor {
         console("minecraft:execute in " + dim + " run minecraft:kill @e[tag=amitie_statue]");
         for (int i = 0; i < FRIENDS.length; i++) {
             double z = STATUE_Z0 + i * STATUE_GAP;
-            String rider = "{id:\"minecraft:mannequin\",profile:\"" + FRIENDS[i] + "\",immovable:1b,hide_description:1b,"
+            String rider = "{id:\"minecraft:mannequin\",profile:" + FRIENDS[i] + ",immovable:1b,hide_description:1b,"
                     + "Invulnerable:1b,Silent:1b,PersistenceRequired:1b,Rotation:[90f,0f],Tags:[\"amitie\",\"amitie_statue\"]}";
             console(String.format(java.util.Locale.ROOT, "minecraft:execute in %s run minecraft:summon minecraft:armor_stand %.2f %.2f %.2f "
                     + "{Invisible:1b,Marker:1b,NoGravity:1b,Invulnerable:1b,Rotation:[90f,0f],Tags:[\"amitie\",\"amitie_statue\"],"
                     + "Passengers:[%s]}", dim, STATUE_X, y, z, rider));
         }
+    }
+
+    private static void spin(Display d, Quaternionf q) {
+        Transformation t = d.getTransformation();
+        d.setInterpolationDelay(0);
+        d.setInterpolationDuration(RING_STEP * 2);
+        d.setTransformation(new Transformation(t.getTranslation(), q, t.getScale(), t.getRightRotation()));
     }
 
     private static void console(String cmd) {
@@ -215,11 +229,22 @@ final class Amitie implements Listener, TabExecutor {
     private void ambience() {
         if (world == null || world.getPlayers().isEmpty()) return;
         clockYaw = (clockYaw + 2f) % 360f;
+        tick++;
+        boolean ringStep = tick % RING_STEP == 0;
+        float face = (float) plugin.getConfig().getDouble("amitie.horloge.yaw", -90.0);
         for (Entity e : world.getEntities()) {
-            if (e.getScoreboardTags().contains("amitie_horloge")) e.setRotation(clockYaw, 0f);
-            else if (e.getScoreboardTags().contains("amitie_etoile")) {
+            java.util.Set<String> tags = e.getScoreboardTags();
+            if (tags.contains("amitie_horloge")) {
+                // the Eternal Clock faces the bench and sways gently, as if breathing
+                e.setRotation(face + (float) (CLOCK_SWAY * Math.sin(tick * .03)), 0f);
+                if (Math.random() < .12) world.spawnParticle(Particle.WAX_ON, e.getLocation(), 1, 1.2, 1.2, 1.2, .02);
+            } else if (tags.contains("amitie_etoile")) {
                 e.setRotation(-clockYaw, 0f);
                 if (Math.random() < .25) world.spawnParticle(Particle.END_ROD, e.getLocation(), 1, .3, .3, .3, .01);
+            } else if (ringStep && tags.contains("amitie_anneau_a") && e instanceof Display d) {
+                spin(d, new Quaternionf().rotateY(tick * .045f).rotateX(.45f));
+            } else if (ringStep && tags.contains("amitie_anneau_b") && e instanceof Display d) {
+                spin(d, new Quaternionf().rotateX(tick * .035f).rotateZ(-.6f));
             }
         }
         Location arch = new Location(world, 0.5, 129, 0.5);
