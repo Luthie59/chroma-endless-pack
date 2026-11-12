@@ -229,6 +229,14 @@ final class TimeRift implements Listener {
             Player p = Bukkit.getPlayer(e.getKey());
             if (p != null && (e.getValue() >= needed || inZone(p))) rewarded.add(p);
         }
+        List<Player> runnersUp = new ArrayList<>();
+        for (Map.Entry<String, Map<UUID, Integer>> team : participants.entrySet()) {
+            if (team.getKey().equals(t.key())) continue;
+            for (Map.Entry<UUID, Integer> e : team.getValue().entrySet()) {
+                Player p = Bukkit.getPlayer(e.getKey());
+                if (p != null && e.getValue() >= needed) runnersUp.add(p);
+            }
+        }
         end();                                   // first: a failing reward command must never replay the win
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.sendTitle("§6§l✦ " + t.name() + " ✦", "§7remporte la faille temporelle !", 10, 70, 20);
@@ -238,15 +246,21 @@ final class TimeRift implements Listener {
         broadcast("§5⌛ " + label(t) + " §6remporte la faille temporelle !"
                 + (chest ? " §7Le §6coffre du temps §7est apparu en son cœur." : ""));
         for (Player p : rewarded) {
-            for (String cmd : cfg.rewardCommands()) {
-                String line = cmd.replace("{player}", p.getName()).replace("{faction}", t.name());
-                try {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), line);
-                } catch (RuntimeException ex) {
-                    plugin.getLogger().warning("Récompense de faille échouée (" + line + ") : " + ex);
-                }
-            }
+            for (String cmd : cfg.rewardCommands()) run(cmd, p, t);
             p.sendMessage("§6✦ §7Récompense de la faille reçue !");
+        }
+        for (Player p : runnersUp) {
+            for (String cmd : cfg.participationCommands()) run(cmd, p, t);
+            p.sendMessage("§5⌛ §7Tu t'es battu pour la faille : récompense de participation reçue.");
+        }
+    }
+
+    private void run(String cmd, Player p, FactionBridge.Team t) {
+        String line = cmd.replace("{player}", p.getName()).replace("{faction}", t.name());
+        try {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), line);
+        } catch (RuntimeException ex) {
+            plugin.getLogger().warning("Récompense de faille échouée (" + line + ") : " + ex);
         }
     }
 
