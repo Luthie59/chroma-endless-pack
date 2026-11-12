@@ -138,6 +138,34 @@ def orrery_ring():
             d.ellipse([x - 1.5, y - 1.5, x + 1.5, y + 1.5], fill=PINK)
     return im
 
+def giant_ring():
+    """256 px ring for the huge armillary rings around the island: thin gold band, circular script, gems."""
+    G = 256; c = G / 2
+    im = Image.new("RGBA", (G, G), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    d.ellipse([c - 127, c - 127, c + 127, c + 127], fill=GOLD)
+    d.ellipse([c - 120, c - 120, c + 120, c + 120], fill=(0, 0, 0, 0))
+    d.ellipse([c - 127, c - 127, c + 127, c + 127], outline=GOLD_D, width=1)
+    d.ellipse([c - 120, c - 120, c + 120, c + 120], outline=GOLD_D, width=1)
+    d.ellipse([c - 123.5, c - 123.5, c + 123.5, c + 123.5], outline=GOLD_XL, width=1)
+    for k in range(72):                                  # engraved ticks along the band
+        a = k * 2 * math.pi / 72
+        d.line([(c + math.cos(a) * 121, c + math.sin(a) * 121), (c + math.cos(a) * 122.5, c + math.sin(a) * 122.5)], fill=GOLD_D)
+    for k in range(24):                                  # circular-script words hanging inward
+        a = k * 2 * math.pi / 24 + .13
+        x, y = c + math.cos(a) * 113, c + math.sin(a) * 113
+        r = 5 if k % 3 == 0 else 3.5
+        d.ellipse([x - r, y - r, x + r, y + r], outline=GOLD_L, width=1)
+        if k % 3 == 0:
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], outline=GOLD_L)
+            d.line([(x, y), (c + math.cos(a) * 120, c + math.sin(a) * 120)], fill=GOLD_L)
+        else:
+            d.point((x + 1, y - 1), fill=GOLD_XL)
+    for k in range(12):                                  # gems set in the band
+        a = k * 2 * math.pi / 12
+        x, y = c + math.cos(a) * 123.5, c + math.sin(a) * 123.5
+        d.ellipse([x - 2.5, y - 2.5, x + 2.5, y + 2.5], fill=PINK if k % 2 else (170, 120, 255, 255), outline=GOLD_D)
+    return im
+
 def png(im):
     b = io.BytesIO(); im.save(b, "PNG", optimize=True); return b.getvalue()
 
@@ -148,6 +176,7 @@ def build():
     f[t + "horloge_hands.png"] = png(hands())
     f[t + "horloge_back.png"] = png(back())
     f[t + "anneau_eternel.png"] = png(orrery_ring())
+    f[t + "anneau_geant.png"] = png(giant_ring())
     plate = lambda z0, z1, north, south: {"from": [0, 0, z0], "to": [16, 16, z1], "faces": {
         **({"north": {"uv": [0, 0, 16, 16], "texture": north}} if north else {}),
         **({"south": {"uv": [0, 0, 16, 16], "texture": south}} if south else {})}}
@@ -158,9 +187,12 @@ def build():
     f["assets/chroma/models/item/anneau_eternel.json"] = json.dumps({
         "textures": {"ring": "chroma:item/anneau_eternel", "particle": "chroma:item/anneau_eternel"},
         "elements": [plate(8, 8, "#ring", "#ring")]}).encode()
-    for name in ("horloge_eternelle", "anneau_eternel"):
+    f["assets/chroma/models/item/anneau_geant.json"] = json.dumps({
+        "textures": {"ring": "chroma:item/anneau_geant", "particle": "chroma:item/anneau_geant"},
+        "elements": [plate(8, 8, "#ring", "#ring")]}).encode()
+    for name in ("horloge_eternelle", "anneau_eternel", "anneau_geant"):
         f["assets/chroma/items/%s.json" % name] = json.dumps({"model": {"type": "minecraft:model", "model": "chroma:item/" + name}}).encode()
-    return f, {"face": face(), "hands": hands(), "back": back(), "ring": orrery_ring()}
+    return f, {"face": face(), "hands": hands(), "back": back(), "ring": orrery_ring(), "giant": giant_ring()}
 
 if __name__ == "__main__":
     import os, sys
@@ -170,4 +202,5 @@ if __name__ == "__main__":
     for i, k in enumerate((combo, ims["back"], ims["ring"], ims["face"])):
         sheet.alpha_composite(k, (i * (N + 10), 0))
     sheet.resize((sheet.width * 2, sheet.height * 2), Image.NEAREST).save(os.path.join(sys.argv[1], "horloge_preview.png"))
+    ims["giant"].save(os.path.join(sys.argv[1], "anneau_geant_preview.png"))
     print("ok")
