@@ -44,7 +44,6 @@ final class Amitie implements Listener, TabExecutor {
         @Override public boolean shouldGenerateDecorations() { return false; }
         @Override public boolean shouldGenerateMobs() { return false; }
         @Override public boolean shouldGenerateStructures() { return false; }
-        @Override public boolean shouldGenerateBedrock() { return false; }
     }
 
     private static final class CherrySky extends BiomeProvider {
@@ -61,7 +60,7 @@ final class Amitie implements Listener, TabExecutor {
         world = Bukkit.getWorld(WORLD);
         if (world == null) {
             world = new WorldCreator(WORLD).generator(new VoidGenerator()).biomeProvider(new CherrySky())
-                    .generateStructures(false).keepSpawnInMemory(false).createWorld();
+                    .generateStructures(false).createWorld();
         }
         if (world == null) {
             plugin.getLogger().warning("Monde « " + WORLD + " » impossible à créer.");
