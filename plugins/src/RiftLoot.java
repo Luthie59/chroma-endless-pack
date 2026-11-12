@@ -48,7 +48,7 @@ final class RiftLoot implements Listener {
 
     private final Plugin plugin;
     private final FactionBridge factions;
-    private final RiftMobs mobs;
+    private final Chronon chronon;
     private final Logger log;
     private final File store;
     private final Random rnd = new Random();
@@ -58,10 +58,10 @@ final class RiftLoot implements Listener {
     private long protectedUntil;
     private BukkitTask expiry, sparkle;
 
-    RiftLoot(Plugin plugin, FactionBridge factions, RiftMobs mobs) {
+    RiftLoot(Plugin plugin, FactionBridge factions, Chronon chronon) {
         this.plugin = plugin;
         this.factions = factions;
-        this.mobs = mobs;
+        this.chronon = chronon;
         this.log = plugin.getLogger();
         this.store = new File(plugin.getDataFolder(), "faille-coffre.yml");
         cleanLeftover();
@@ -121,20 +121,9 @@ final class RiftLoot implements Listener {
             double chance = p.length > 2 ? Double.parseDouble(p[2]) / 100.0 : 1.0;
             if (rnd.nextDouble() >= chance) return null;
             int amount = min + rnd.nextInt(Math.max(1, max - min + 1));
-            if (p[0].equalsIgnoreCase("CHRONON")) return mobs.fragment(amount);
-            if (p[0].equalsIgnoreCase("RELIC")) return RiftRelics.randomRelic(rnd);
-            if (p[0].toUpperCase(java.util.Locale.ROOT).startsWith("ENCHANTED_BOOK:")) {
-                String[] b = p[0].split(":");
-                ItemStack book = RiftRelics.book(b[1], b.length > 2 ? Integer.parseInt(b[2]) : 99);
-                if (book == null) log.warning("Enchantement inconnu dans le butin : " + line);
-                return book;
-            }
-            Material m = Material.matchMaterial(p[0]);
-            if (m == null || !m.isItem()) {
-                log.warning("Butin de faille invalide : " + line);
-                return null;
-            }
-            return new ItemStack(m, Math.min(amount, m.getMaxStackSize()));
+            ItemStack item = ItemSpecs.create(p[0], amount, chronon, rnd);
+            if (item == null) log.warning("Butin de faille invalide : " + line);
+            return item;
         } catch (NumberFormatException e) {
             log.warning("Butin de faille invalide : " + line);
             return null;
