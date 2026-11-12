@@ -1,5 +1,5 @@
 name: CitadelleMessages
-version: 1.8.1
+version: 1.8.2
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
 description: Faille temporelle + Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
