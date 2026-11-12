@@ -50,6 +50,7 @@ final class HousesBoard implements Listener {
         this.store = new File(plugin.getDataFolder(), "maisons.yml");
         this.wins = YamlConfiguration.loadConfiguration(store);
         Bukkit.getScheduler().runTaskLater(plugin, this::respawn, 40L);
+        Bukkit.getScheduler().runTaskTimer(plugin, this::watchdog, 100L, 100L);
         Bukkit.getScheduler().runTaskTimer(plugin, this::refresh, 100L, Math.max(10, cfg().getInt("refresh-seconds", 60)) * 20L);
     }
 
@@ -179,6 +180,13 @@ final class HousesBoard implements Listener {
             t.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.25f), new Quaternionf()));
             t.setText(text());
         });
+    }
+
+    /** every few seconds: if our chunk is loaded but the entity is gone (chunk reloaded early, removed…), respawn. */
+    private void watchdog() {
+        Location at = saved();
+        if (at == null || (display != null && display.isValid())) return;
+        if (at.getWorld().isChunkLoaded(at.getBlockX() >> 4, at.getBlockZ() >> 4)) respawn();
     }
 
     void despawn() {
