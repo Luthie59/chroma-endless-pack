@@ -1,5 +1,5 @@
 name: CitadelleMessages
-version: 1.3.0
+version: 1.4.0
 main: fr.citadelle.messages.CitadelleMessages
 api-version: '1.21'
 description: Faille temporelle + Regeneration a la mort + faux messages d'arrivee/depart stylises quand le staff passe en vanish (Staff++).
@@ -10,7 +10,14 @@ commands:
     description: Infos sur la faille temporelle (start/stop/tp/reload pour le staff).
     usage: /faille [info|start [ici]|stop|tp|reload]
     aliases: [rift]
+  chronon:
+    description: Echanger ses fragments de chronon aupres de l'Horloger (pnj/donner/reload pour le staff).
+    usage: /chronon [pnj [retirer] | donner <joueur> <n> | reload]
+    aliases: [chronons, echange, horloger]
 permissions:
+  citadelle.chronon.admin:
+    description: Placer l'Horloger, donner des fragments, recharger les offres.
+    default: op
   citadelle.faille.admin:
     description: Lancer, arreter et configurer la faille temporelle.
     default: op
