@@ -140,3 +140,13 @@ chronons:
       nom: "&b&lÉlytres"
       description: ["&7Pour voler entre les époques."]
       donne: ["ELYTRA 1"]
+
+# Les Grandes Maisons : classement des factions (hologramme au spawn + /maisons).
+# Prestige = power x power + terres x terres + failles x victoires de faille. /maisons place pour l'installer.
+maisons:
+  top: 5
+  refresh-seconds: 60
+  prestige:
+    power: 1
+    terres: 2
+    failles: 25
