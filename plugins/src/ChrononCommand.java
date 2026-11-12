@@ -18,9 +18,9 @@ final class ChrononCommand implements TabExecutor {
     private final CitadelleMessages plugin;
     private final Chronon chronon;
     private final ChrononShop shop;
-    private final Horloger horloger;
+    private final CitadelleNpc horloger;
 
-    ChrononCommand(CitadelleMessages plugin, Chronon chronon, ChrononShop shop, Horloger horloger) {
+    ChrononCommand(CitadelleMessages plugin, Chronon chronon, ChrononShop shop, CitadelleNpc horloger) {
         this.plugin = plugin;
         this.chronon = chronon;
         this.shop = shop;
