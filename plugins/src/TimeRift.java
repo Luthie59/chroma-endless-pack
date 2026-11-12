@@ -63,6 +63,10 @@ final class TimeRift implements Listener {
     private String lastAutoMinute = "";
 
     private final java.util.function.Consumer<FactionBridge.Team> onWin;
+    private java.util.function.BiConsumer<Player, Boolean> onParticipant = (p, won) -> { };
+
+    /** told about every player who really fought in a won rift (true = on the winning side). */
+    void onParticipant(java.util.function.BiConsumer<Player, Boolean> hook) { this.onParticipant = hook; }
 
     TimeRift(CitadelleMessages plugin, Chronon chronon, FactionBridge factions, java.util.function.Consumer<FactionBridge.Team> onWin) {
         this.plugin = plugin;
@@ -259,9 +263,19 @@ final class TimeRift implements Listener {
             for (String cmd : cfg.rewardCommands()) run(cmd, p, t);
             p.sendMessage("§6✦ §7Récompense de la faille reçue !");
         }
+        for (Player p : rewarded) notifyParticipant(p, true);
+        for (Player p : runnersUp) notifyParticipant(p, false);
         for (Player p : runnersUp) {
             for (String cmd : cfg.participationCommands()) run(cmd, p, t);
             p.sendMessage("§5⌛ §7Tu t'es battu pour la faille : récompense de participation reçue.");
+        }
+    }
+
+    private void notifyParticipant(Player p, boolean won) {
+        try {
+            onParticipant.accept(p, won);
+        } catch (RuntimeException ex) {
+            plugin.getLogger().warning("Suivi de quête de faille échoué : " + ex);
         }
     }
 
