@@ -10,6 +10,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -78,6 +80,7 @@ final class Horloger implements Listener {
             if (e.getScoreboardTags().contains(TAG)) e.remove();
         }
         npc = at.getWorld().spawn(at, Mannequin.class, this::dress);
+        if (!npc.isValid()) plugin.getLogger().warning("L'Horloger n'a pas pu apparaître (un plugin bloque son apparition).");
     }
 
     private void dress(Mannequin m) {
@@ -176,6 +179,15 @@ final class Horloger implements Listener {
         float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
         float pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
         npc.setRotation(yaw, pitch);
+    }
+
+    /**
+     * The spawn's WorldGuard region denies mob spawning, which also cancels our Mannequin.
+     * Only the Horloger (already tagged when the event fires) is let through.
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onSpawn(EntitySpawnEvent event) {
+        if (event.isCancelled() && isNpc(event.getEntity())) event.setCancelled(false);
     }
 
     @EventHandler
