@@ -12,3 +12,41 @@ regeneration:
   subtitle: "&eUne nouvelle incarnation commence…"
   # Secondes de Regeneration I offertes au retour (0 = aucune).
   regen-seconds: 5
+
+# Faille temporelle : event PvP. Une faille s'ouvre loin du spawn, les factions se battent pour la tenir.
+faille:
+  enabled: true
+  world: world
+  # Ouvertures automatiques (heure de Paris), seulement s'il y a assez de joueurs connectes.
+  auto: true
+  timezone: Europe/Paris
+  times: ["15:00", "18:00", "21:00"]
+  min-players: 2
+  # Distance du spawn (0,0) ou la faille peut apparaitre (hors claims, hors eau).
+  min-distance: 600
+  max-distance: 1800
+  # Temps pour s'y rendre apres l'annonce, duree max, et temps de controle pour gagner (secondes).
+  warmup-seconds: 300
+  max-duration-seconds: 1200
+  capture-seconds: 180
+  radius: 6
+  # Vagues d'echos temporels (seulement si des joueurs sont proches).
+  wave-interval-seconds: 45
+  max-mobs: 18
+  # Commandes console pour chaque joueur gagnant ayant participe ({player}, {faction}).
+  reward-commands:
+    - "eco give {player} 2500"
+  # Coffre du temps : reserve aux gagnants pendant chest-protection-seconds, disparait apres chest-lifetime-seconds.
+  chest-protection-seconds: 60
+  chest-lifetime-seconds: 300
+  # "MATERIAU min-max chance%" ; CHRONON = fragment de chronon.
+  loot:
+    - "DIAMOND 2-5 100"
+    - "GOLDEN_APPLE 2-4 100"
+    - "ENCHANTED_GOLDEN_APPLE 1 15"
+    - "NETHERITE_SCRAP 1-2 40"
+    - "EMERALD 8-16 80"
+    - "EXPERIENCE_BOTTLE 8-16 80"
+    - "ENDER_PEARL 4-8 70"
+    - "TOTEM_OF_UNDYING 1 20"
+    - "CHRONON 3-6 100"
