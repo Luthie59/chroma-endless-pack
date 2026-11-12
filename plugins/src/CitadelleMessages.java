@@ -24,17 +24,30 @@ public final class CitadelleMessages extends JavaPlugin implements Listener {
     private static final Pattern HEX = Pattern.compile("&#([0-9a-fA-F]{6})");
     private Method papiSet;
     private TimeRift rift;
+    private Horloger horloger;
 
     @Override
     public void onDisable() {
         if (rift != null) rift.shutdown();
+        if (horloger != null) horloger.despawn();
     }
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new Regeneration(this), this);
-        rift = new TimeRift(this);
+        Chronon chronon = new Chronon(this);
+        rift = new TimeRift(this, chronon);
+        ChrononShop shop = new ChrononShop(this, chronon);
+        getServer().getPluginManager().registerEvents(shop, this);
+        horloger = new Horloger(this, shop);
+        getServer().getPluginManager().registerEvents(horloger, this);
+        org.bukkit.command.PluginCommand chrononCmd = getCommand("chronon");
+        if (chrononCmd != null) {
+            ChrononCommand cc = new ChrononCommand(this, chronon, shop, horloger);
+            chrononCmd.setExecutor(cc);
+            chrononCmd.setTabCompleter(cc);
+        }
         org.bukkit.command.PluginCommand faille = getCommand("faille");
         if (faille != null) {
             RiftCommand cmd = new RiftCommand(this, rift);
