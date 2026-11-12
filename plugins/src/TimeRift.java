@@ -200,10 +200,15 @@ final class TimeRift implements Listener {
 
     private boolean inZone(Player p) {
         if (p.isDead() || (p.getGameMode() != GameMode.SURVIVAL && p.getGameMode() != GameMode.ADVENTURE)) return false;
-        if (p.hasMetadata("vanished")) return false;
+        if (isVanished(p)) return false;
         Location l = p.getLocation();
         double dx = l.getX() - center.getX(), dz = l.getZ() - center.getZ();
         return dx * dx + dz * dz <= cfg.radius() * cfg.radius() && Math.abs(l.getY() - center.getY()) <= ZONE_HEIGHT;
+    }
+
+    /** Essentials / Staff++ keep a "vanished" metadata on everyone: only a true value means hidden. */
+    private static boolean isVanished(Player p) {
+        return p.getMetadata("vanished").stream().anyMatch(org.bukkit.metadata.MetadataValue::asBoolean);
     }
 
     private void timeout() {
