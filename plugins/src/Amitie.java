@@ -1,7 +1,6 @@
 package fr.citadelle.messages;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -80,18 +79,10 @@ final class Amitie implements Listener, TabExecutor {
         Bukkit.getScheduler().runTaskTimer(plugin, this::ambience, 40L, 2L);
     }
 
-    /** gamerule names differ between Spigot and Paper builds: try the new name, then the legacy one. */
-    @SuppressWarnings("unchecked")
+    /** the GameRule API differs between Spigot and Paper builds: use the vanilla command, which never changes shape. */
     private void rule(String name, String legacy) {
-        for (String n : new String[]{name, legacy}) {
-            if (n == null) continue;
-            GameRule<?> r = GameRule.getByName(n);
-            if (r != null && r.getType() == Boolean.class) {
-                world.setGameRule((GameRule<Boolean>) r, false);
-                return;
-            }
-        }
-        plugin.getLogger().fine("Règle de jeu introuvable : " + name);
+        String dim = world.getKey().toString();
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:execute in " + dim + " run minecraft:gamerule " + name + " false");
     }
 
     private Location arrival() {
