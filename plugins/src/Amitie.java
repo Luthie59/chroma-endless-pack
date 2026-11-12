@@ -66,18 +66,32 @@ final class Amitie implements Listener, TabExecutor {
             plugin.getLogger().warning("Monde « " + WORLD + " » impossible à créer.");
             return;
         }
-        world.setGameRule(GameRule.ADVANCE_TIME, false);
-        world.setGameRule(GameRule.ADVANCE_WEATHER, false);
-        world.setGameRule(GameRule.SPAWN_MOBS, false);
-        world.setGameRule(GameRule.SPAWN_MONSTERS, false);
-        world.setGameRule(GameRule.SPAWN_PHANTOMS, false);
-        world.setGameRule(GameRule.SPAWN_PATROLS, false);
-        world.setGameRule(GameRule.SPAWN_WANDERING_TRADERS, false);
+        rule("advance_time", "doDaylightCycle");
+        rule("advance_weather", "doWeatherCycle");
+        rule("spawn_mobs", "doMobSpawning");
+        rule("spawn_monsters", null);
+        rule("spawn_phantoms", "doInsomnia");
+        rule("spawn_patrols", "doPatrolSpawning");
+        rule("spawn_wandering_traders", "doTraderSpawning");
         world.setTime(SUNSET);
         world.setStorm(false);
         world.setThundering(false);
         world.setSpawnLocation(arrival());
         Bukkit.getScheduler().runTaskTimer(plugin, this::ambience, 40L, 2L);
+    }
+
+    /** gamerule names differ between Spigot and Paper builds: try the new name, then the legacy one. */
+    @SuppressWarnings("unchecked")
+    private void rule(String name, String legacy) {
+        for (String n : new String[]{name, legacy}) {
+            if (n == null) continue;
+            GameRule<?> r = GameRule.getByName(n);
+            if (r != null && r.getType() == Boolean.class) {
+                world.setGameRule((GameRule<Boolean>) r, false);
+                return;
+            }
+        }
+        plugin.getLogger().fine("Règle de jeu introuvable : " + name);
     }
 
     private Location arrival() {
