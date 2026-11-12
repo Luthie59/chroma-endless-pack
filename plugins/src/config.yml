@@ -64,3 +64,79 @@ faille:
     - "SHULKER_BOX 1 25"
     - "ELYTRA 1 6"
     - "CHRONON 10-20 100"
+
+# Echange de fragments de chronon aupres de l'Horloger (/chronon ou clic droit sur le PNJ).
+# Emplacements dores du fond : 10 a 16 (ligne du haut) et 28, 30, 32, 34 (ligne du bas).
+# donne : objets ("MATERIAU quantite", CHRONON, RELIC, ENCHANTED_BOOK:enchantement[:niveau]).
+# commandes : commandes console ({player}). Le PNJ se place avec /chronon pnj.
+chronons:
+  offres:
+    xp:
+      slot: 10
+      prix: 4
+      icone: EXPERIENCE_BOTTLE
+      nom: "&a16 fioles d'expérience"
+      donne: ["EXPERIENCE_BOTTLE 16"]
+    perles:
+      slot: 11
+      prix: 5
+      icone: ENDER_PEARL
+      nom: "&38 perles de l'Ender"
+      donne: ["ENDER_PEARL 8"]
+    pommes:
+      slot: 12
+      prix: 6
+      icone: GOLDEN_APPLE
+      nom: "&64 pommes dorées"
+      donne: ["GOLDEN_APPLE 4"]
+    argent:
+      slot: 13
+      prix: 8
+      icone: GOLD_INGOT
+      nom: "&e1 000 $"
+      description: ["&7Le temps, c'est de l'argent."]
+      commandes: ["eco give {player} 1000"]
+    totem:
+      slot: 14
+      prix: 15
+      icone: TOTEM_OF_UNDYING
+      nom: "&eTotem d'immortalité"
+      donne: ["TOTEM_OF_UNDYING 1"]
+    raccommodage:
+      slot: 15
+      prix: 20
+      icone: ENCHANTED_BOOK
+      nom: "&dLivre : Raccommodage"
+      donne: ["ENCHANTED_BOOK:mending"]
+    netherite:
+      slot: 16
+      prix: 25
+      icone: NETHERITE_INGOT
+      nom: "&8Lingot de netherite"
+      donne: ["NETHERITE_INGOT 1"]
+    pomme_enchantee:
+      slot: 28
+      prix: 30
+      icone: ENCHANTED_GOLDEN_APPLE
+      nom: "&6&lPomme dorée enchantée"
+      donne: ["ENCHANTED_GOLDEN_APPLE 1"]
+    shulker:
+      slot: 30
+      prix: 35
+      icone: SHULKER_BOX
+      nom: "&5Boîte de Shulker"
+      donne: ["SHULKER_BOX 1"]
+    relique:
+      slot: 32
+      prix: 60
+      icone: NETHERITE_SWORD
+      nom: "&6&l✦ Relique temporelle"
+      description: ["&7Une relique légendaire au hasard :", "&7Lame du Gardien, Arc de la Sentinelle,", "&7Couronne du Seigneur du Temps…"]
+      donne: ["RELIC"]
+    elytres:
+      slot: 34
+      prix: 90
+      icone: ELYTRA
+      nom: "&b&lÉlytres"
+      description: ["&7Pour voler entre les époques."]
+      donne: ["ELYTRA 1"]
