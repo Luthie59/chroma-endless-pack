@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -66,11 +67,15 @@ final class RiftLoot implements Listener {
         cleanLeftover();
     }
 
-    void place(Location center, FactionBridge.Team winner, RiftConfig cfg) {
+    /** @return true when the chest was actually placed. */
+    boolean place(Location center, FactionBridge.Team winner, RiftConfig cfg) {
         remove();
         Block b = center.getBlock();
-        for (int i = 0; i < 6 && !b.isPassable(); i++) b = b.getRelative(BlockFace.UP);
-        if (!b.isPassable()) return;
+        for (int i = 0; i < 8 && !replaceable(b); i++) b = b.getRelative(BlockFace.UP);
+        if (!replaceable(b)) {
+            log.warning("Coffre du temps impossible à poser près de " + center.getBlockX() + " " + center.getBlockY() + " " + center.getBlockZ());
+            return false;
+        }
         b.setType(Material.CHEST);
         if (b.getState() instanceof Chest state) fill(state.getBlockInventory(), cfg.loot());
         chest = b;
@@ -81,6 +86,13 @@ final class RiftLoot implements Listener {
         sparkle = Bukkit.getScheduler().runTaskTimer(plugin, () ->
                 fx.getWorld().spawnParticle(Particle.WAX_ON, fx, 6, 0.3, 0.3, 0.3, 0.2), 0L, 10L);
         expiry = Bukkit.getScheduler().runTaskLater(plugin, this::remove, cfg.chestLifetimeSeconds() * 20L);
+        log.info("Coffre du temps posé en " + b.getX() + " " + b.getY() + " " + b.getZ());
+        return true;
+    }
+
+    /** air, plants, snow layers and leaves can make room for the chest. */
+    private static boolean replaceable(Block b) {
+        return b.isPassable() || Tag.LEAVES.isTagged(b.getType());
     }
 
     private void fill(Inventory inv, List<String> lines) {
