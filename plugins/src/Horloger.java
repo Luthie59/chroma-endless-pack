@@ -90,18 +90,15 @@ final class Horloger implements Listener {
         m.setInvulnerable(true);
         m.setSilent(true);
         m.setRemoveWhenFarAway(false);
-        EntityEquipment eq = m.getEquipment();
-        if (eq == null) return;
-        eq.setChestplate(armour(Material.LEATHER_CHESTPLATE));
-        eq.setLeggings(armour(Material.LEATHER_LEGGINGS));
-        eq.setBoots(armour(Material.LEATHER_BOOTS));
-        eq.setItemInMainHand(new ItemStack(Material.CLOCK));
-        eq.setItemInOffHand(new ItemStack(Material.SPYGLASS));
-        eq.setChestplateDropChance(0f);
-        eq.setLeggingsDropChance(0f);
-        eq.setBootsDropChance(0f);
-        eq.setItemInMainHandDropChance(0f);
-        eq.setItemInOffHandDropChance(0f);
+        safely(() -> {                         // equipment only: a Mannequin is not a Mob (no drop chances)
+            EntityEquipment eq = m.getEquipment();
+            if (eq == null) return;
+            eq.setChestplate(armour(Material.LEATHER_CHESTPLATE));
+            eq.setLeggings(armour(Material.LEATHER_LEGGINGS));
+            eq.setBoots(armour(Material.LEATHER_BOOTS));
+            eq.setItemInMainHand(new ItemStack(Material.CLOCK));
+            eq.setItemInOffHand(new ItemStack(Material.SPYGLASS));
+        });
     }
 
     /** Mannequin-only API differs between Spigot and Paper: never let it break the NPC. */
@@ -109,7 +106,7 @@ final class Horloger implements Listener {
         try {
             call.run();
         } catch (LinkageError | RuntimeException e) {
-            plugin.getLogger().fine("API mannequin indisponible : " + e);
+            plugin.getLogger().warning("Mannequin : " + e);
         }
     }
 
