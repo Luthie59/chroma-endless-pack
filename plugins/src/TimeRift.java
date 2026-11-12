@@ -85,6 +85,8 @@ final class TimeRift implements Listener {
     Phase phase() { return phase; }
     Location center() { return center == null ? null : center.clone(); }
     RiftConfig config() { return cfg; }
+    int countdown() { return countdown; }
+    String holderName() { return holder == null || control != Control.HELD ? null : holder.name(); }
 
     // ------------------------------------------------------------------ lifecycle
 
